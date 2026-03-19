@@ -110,29 +110,10 @@ defmodule Amplified.PubSub do
   ## Handling messages
 
   `PubSub.handle_info/2` returns `{:cont, socket}` or `{:halt, socket}` —
-  the same convention used by `Phoenix.LiveView.attach_hook/4`. This is
-  intentional: it means you can wire PubSub dispatch directly into the
-  LiveView lifecycle as a hook, which is the recommended approach for
-  applications with many LiveViews.
-
-  ### Per-view dispatch
-
-  The simplest approach is to call `PubSub.handle_info/2` in each
-  LiveView's `handle_info/2`:
-
-      def handle_info(message, socket) do
-        case PubSub.handle_info(message, socket) do
-          {:cont, socket} -> {:noreply, socket}
-          {:halt, socket} -> {:noreply, socket}
-        end
-      end
-
-  ### Global dispatch with `attach_hook`
-
-  For applications with many LiveViews, a better approach is to subscribe
-  and attach the PubSub dispatcher once as an `on_mount` hook. This way
-  every LiveView in the live session gets PubSub handling automatically,
-  with no per-view boilerplate.
+  the same convention used by `Phoenix.LiveView.attach_hook/4` — so you
+  can wire it directly into the LiveView lifecycle as an `on_mount` hook.
+  Every LiveView in the live session then gets PubSub handling
+  automatically, with no per-view boilerplate.
 
   Define a hooks module:
 
@@ -189,16 +170,20 @@ defmodule Amplified.PubSub do
 
   ### Event handling in schemas
 
-  The idiomatic place to handle PubSub events is in the schema's own
-  `use Amplified.PubSub` block. When a `{action, subject}` message
-  arrives, the Tuple dispatcher looks up the subject's protocol
-  implementation and calls its `handle_info/3`. This keeps the handling
-  logic colocated with the schema it concerns.
+  When a `{action, subject}` message arrives, the Tuple dispatcher looks
+  up the subject's protocol implementation and calls its `handle_info/3`.
+  This lets you define handlers in the schema's `use Amplified.PubSub`
+  block.
 
-  For example, in Phoenix 1.8+ to keep the current user up to date
-  across all LiveViews, you would define a `handle_info/3` implementation
-  on your `User` schema, matching the broadcast user's ID against the
-  scope's current `:user`:
+  > #### When to use schema-level handlers {: .info}
+  >
+  > Reserve schema-level handlers for events that would otherwise require
+  > the same callback to be duplicated across multiple LiveViews. Handlers
+  > specific to a single view belong in that view, not in the schema.
+
+  A good example is keeping the current user up to date across all
+  LiveViews — every view needs the same logic, so colocating it with
+  the schema avoids repetition:
 
       defmodule MyApp.Accounts.User do
         use Ecto.Schema

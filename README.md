@@ -138,7 +138,7 @@ end
 
 ## Event handling in schemas
 
-Handle PubSub events in the schema's own `use Amplified.PubSub` block:
+Reserve schema-level handlers for events that would otherwise require the same callback to be duplicated across multiple LiveViews. Handlers specific to a single view belong in that view.
 
 ```elixir
 defmodule MyApp.Blog.Post do
@@ -165,9 +165,9 @@ end
 
 The following telemetry events are emitted:
 
-| Event | Measurements | Metadata |
-|-------|-------------|----------|
-| `[:amplified, :pubsub, :broadcast]` | `%{}` | `%{topic: String.t(), message: term()}` |
+| Event                               | Measurements | Metadata                                |
+| ----------------------------------- | ------------ | --------------------------------------- |
+| `[:amplified, :pubsub, :broadcast]` | `%{}`        | `%{topic: String.t(), message: term()}` |
 
 Attach a handler to log, instrument, or observe broadcasts:
 

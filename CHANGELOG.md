@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Corrected GitHub organisation URLs
+- Improved documentation to better advise best practices
 
 ## [0.1.0] - 2026-03-18
 
