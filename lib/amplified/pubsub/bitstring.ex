@@ -4,7 +4,7 @@ defimpl Amplified.PubSub.Protocol, for: BitString do
 
   Treats the string as a literal PubSub channel name. This is the
   foundation that all other implementations ultimately delegate to for
-  the actual `Phoenix.PubSub` and endpoint calls.
+  the actual `Phoenix.PubSub` calls.
 
   ## Behaviour
 
@@ -16,9 +16,9 @@ defimpl Amplified.PubSub.Protocol, for: BitString do
       with a `:` separator when provided.
 
     * `subscribe/1` — unsubscribes first (to prevent duplicates), then
-      subscribes via the configured Phoenix endpoint.
+      subscribes via the configured PubSub server.
 
-    * `unsubscribe/1` — unsubscribes via the configured Phoenix endpoint.
+    * `unsubscribe/1` — unsubscribes via the configured PubSub server.
 
   ## Examples
 
@@ -53,10 +53,10 @@ defimpl Amplified.PubSub.Protocol, for: BitString do
   def channel(channel, ns), do: "#{channel}:#{ns}"
 
   def subscribe(channel) do
-    endpoint = Ampd.endpoint()
-    endpoint.unsubscribe(channel)
-    endpoint.subscribe(channel)
+    server = Ampd.pubsub_server()
+    PubSub.unsubscribe(server, channel)
+    PubSub.subscribe(server, channel)
   end
 
-  def unsubscribe(channel), do: Ampd.endpoint().unsubscribe(channel)
+  def unsubscribe(channel), do: PubSub.unsubscribe(Ampd.pubsub_server(), channel)
 end

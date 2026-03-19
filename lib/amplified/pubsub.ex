@@ -22,14 +22,10 @@ defmodule Amplified.PubSub do
 
   ## Configuration
 
-  Configure the Phoenix endpoint whose PubSub server will be used for
-  subscriptions and broadcasts:
+  Configure the PubSub server name used for subscriptions and broadcasts:
 
       # config/config.exs
-      config :ampd_pubsub, endpoint: MyAppWeb.Endpoint
-
-  The PubSub server name is derived automatically from the endpoint's
-  `:pubsub_server` configuration — no additional config is needed.
+      config :ampd_pubsub, pubsub_server: :my_app
 
   ## Setup
 
@@ -51,7 +47,7 @@ defmodule Amplified.PubSub do
 
     * `channel/1` derives `"post:<id>"` from the module's last segment
       (snake_cased) and the struct's `:id` field
-    * `subscribe/1` and `unsubscribe/1` subscribe via the configured endpoint
+    * `subscribe/1` and `unsubscribe/1` subscribe via the configured PubSub server
     * `broadcast/2` wraps atom/string events as `{event, subject}` and
       publishes to the subject's channel
     * `handle_info/2,3,4` return `{:cont, socket}` (pass-through) so
@@ -315,8 +311,8 @@ defmodule Amplified.PubSub do
 
   Built-in protocol implementations handle the following types:
 
-    * `BitString` — treats the string as a literal channel name; broadcasts
-      via `Phoenix.PubSub`, subscribes/unsubscribes via the endpoint
+    * `BitString` — treats the string as a literal channel name; broadcasts,
+      subscribes, and unsubscribes via `Phoenix.PubSub`
     * `Atom` — converts to a string channel (e.g. `:users` → `"users"`);
       broadcast is a no-op that returns the message
     * `Tuple` — unwraps `{:ok, subject}` for broadcast/subscribe; passes
@@ -335,25 +331,11 @@ defmodule Amplified.PubSub do
   alias Amplified.PubSub.Protocol
 
   @doc """
-  Returns the configured Phoenix endpoint module.
+  Returns the configured PubSub server name.
 
-  The endpoint is looked up from application config at runtime via
-  `Application.fetch_env!/2`. Raises `ArgumentError` if `:endpoint` is not
-  configured for `:ampd_pubsub`.
-
-  ## Examples
-
-      Amplified.PubSub.endpoint()
-      #=> MyAppWeb.Endpoint
-
-  """
-  def endpoint, do: Application.fetch_env!(:ampd_pubsub, :endpoint)
-
-  @doc """
-  Returns the PubSub server name from the configured endpoint.
-
-  This is the atom passed to `Phoenix.PubSub.broadcast/3` internally,
-  derived from the endpoint's `:pubsub_server` configuration.
+  The server name is looked up from application config at runtime via
+  `Application.fetch_env!/2`. Raises `ArgumentError` if `:pubsub_server`
+  is not configured for `:ampd_pubsub`.
 
   ## Examples
 
@@ -361,7 +343,7 @@ defmodule Amplified.PubSub do
       #=> :my_app
 
   """
-  def pubsub_server, do: endpoint().config(:pubsub_server)
+  def pubsub_server, do: Application.fetch_env!(:ampd_pubsub, :pubsub_server)
 
   @all_funs [
     broadcast: 2,

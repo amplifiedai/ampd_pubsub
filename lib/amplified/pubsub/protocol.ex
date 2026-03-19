@@ -89,8 +89,8 @@ defprotocol Amplified.PubSub.Protocol do
   @doc """
   Subscribes the current process to the PubSub channel for the given subject.
 
-  The `BitString` implementation subscribes via the configured Phoenix
-  endpoint. Struct implementations derive the channel first, then delegate
+  The `BitString` implementation subscribes via the configured PubSub
+  server. Struct implementations derive the channel first, then delegate
   to the string implementation.
   """
   @spec subscribe(binary() | struct()) :: :ok | struct() | {:error, term()}
