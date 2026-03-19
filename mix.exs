@@ -31,7 +31,7 @@ defmodule Amplified.PubSub.MixProject do
 
   defp deps do
     [
-      {:phoenix, "~> 1.7"},
+      {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_live_view, "~> 1.0"},
       {:recase, "~> 0.8"},
       {:ecto, "~> 3.10", only: :test},
